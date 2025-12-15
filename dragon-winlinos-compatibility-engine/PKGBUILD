@@ -4,7 +4,7 @@ pkgname=dragon-winlinos-compatibility-engine
 pkgver=8.0.2
 pkgrel=1
 pkgdesc="Customized Wine/Proton fork with advanced anti-cheat obfuscation and performance patches (DXVK/VKD3D-Proton/FEX) for Dragon Winlinos."
-arch=('x86_64')
+arch=('x86_64' 'i686')
 url="https://github.com/DragonWinlinos/Biblioteca_Winlinos"
 license=('LGPL') # Retaining LGPL from Wine/Proton base
 depends=('lib32-vulkan-icd-loader' 'vulkan-icd-loader' 'mesa' 'lib32-mesa' 'libx11' 'lib32-libx11')
@@ -23,6 +23,9 @@ prepare() {
   patch -Np1 -i "../dwce-performance-patch.patch"
 
   # Configure Wine with necessary flags for DWCE
+  # The Arch build system handles the 32-bit build automatically via multilib,
+  # but we ensure the configuration is set up for both.
+  # The actual build process will be split into 64-bit and 32-bit steps in the build() function.
   ./configure --prefix=/usr \
               --enable-win64 \
               --enable-debug-runtime \
@@ -33,12 +36,47 @@ prepare() {
 }
 
 build() {
+  # Build 64-bit version
+  cd "wine-${pkgver}"
+  mkdir -p build64
+  cd build64
+  ../configure --prefix=/usr \
+               --enable-win64 \
+               --with-vulkan \
+               --with-vulkan-driver=vulkan-icd-loader \
+               --with-x \
+               --with-mingw
+  make -j$(nproc)
+
+  # Build 32-bit version (requires multilib environment)
+  cd ..
+  mkdir -p build32
+  cd build32
+  ../configure --prefix=/usr \
+               --enable-win32 \
+               --with-vulkan \
+               --with-vulkan-driver=vulkan-icd-loader \
+               --with-x \
+               --with-mingw
+  make -j$(nproc)
+}
   cd "wine-${pkgver}"
   # Build the DWCE
   make -j$(nproc)
 }
 
 package() {
+  # Install 64-bit version
+  cd "wine-${pkgver}/build64"
+  make install DESTDIR="${pkgdir}"
+
+  # Install 32-bit version
+  cd "../../wine-${pkgver}/build32"
+  make install DESTDIR="${pkgdir}"
+
+  # Post-install: Integrate DXVK/VKD3D-Proton and set up the isolated environment scripts
+  # These scripts will be part of the dwce-utils package, but the core binary is here.
+}
   cd "wine-${pkgver}"
   # Install the DWCE
   make install DESTDIR="${pkgdir}"

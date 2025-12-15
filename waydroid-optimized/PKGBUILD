@@ -4,10 +4,10 @@ pkgname=waydroid-optimized
 pkgver=1.4.2
 pkgrel=1
 pkgdesc="Optimized Waydroid for Dragon Winlinos with full GPU acceleration and seamless desktop integration."
-arch=('x86_64')
+arch=('x86_64' 'i686')
 url="https://github.com/DragonWinlinos/Biblioteca_Winlinos"
 license=('GPL3')
-depends=('lxc' 'python-pyclip' 'python-gbinder' 'libgbinder' 'mesa')
+depends=('lxc' 'python-pyclip' 'python-gbinder' 'libgbinder' 'mesa' 'lib32-mesa' 'lib32-libx11')
 makedepends=('git' 'cmake' 'ninja' 'python-setuptools')
 
 source=("https://github.com/waydroid/waydroid/archive/refs/tags/${pkgver}.tar.gz"
