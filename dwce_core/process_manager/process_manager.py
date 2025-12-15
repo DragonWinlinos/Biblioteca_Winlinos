@@ -11,6 +11,8 @@ import sys
 class ProcessManager:
     def __init__(self):
         self.active_processes = {} # {dwce_pid: {type: 'win'/'android'/'linux', os_pid: 1234, ...}}
+        self.system_arch = "64bit" # Simulação de arquitetura do Winlinos
+
         self.next_dwce_pid = 1000
 
     def _generate_dwce_pid(self):
@@ -64,6 +66,10 @@ class ProcessManager:
         except Exception as e:
             print(f"Erro ao iniciar processo: {e}")
             return None
+
+    def get_system_arch(self):
+        """Retorna a arquitetura do sistema Winlinos (para WoW64)."""
+        return self.system_arch
 
     def terminate_process(self, dwce_pid, exit_code=0):
         """

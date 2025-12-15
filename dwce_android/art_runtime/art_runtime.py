@@ -10,6 +10,8 @@ import time
 class ART_Runtime:
     def __init__(self):
         self.running_apps = {} # {package_name: app_instance}
+        self.profile_data = {} # {package_name: [methods_called]}
+
         self.memory_heap = {} # Simulação de heap de memória
         self.is_initialized = False
 
@@ -21,6 +23,10 @@ class ART_Runtime:
         print("ART Runtime: Inicializando máquina virtual Android (Winlinos ART).")
         # 1. Configurar o Garbage Collector (GC)
         # 2. Inicializar as classes base (java.lang.Object, etc.)
+        # 3. Configurar o JNI Bridge
+        # 4. Carregar perfis de otimização (PGO)
+        self._load_pgo_profiles()
+
         # 3. Configurar o JNI Bridge
         
         self.is_initialized = True
@@ -56,7 +62,10 @@ class ART_Runtime:
         }
         self.running_apps[package_name] = app_instance
         
-        # 4. Chamar o ponto de entrada (onCreate da Activity principal)
+        # 4. Otimizar e compilar o código (PGO/AOT)
+        self._optimize_and_compile(package_name)
+        
+        # 5. Chamar o ponto de entrada (onCreate da Activity principal)
         self._execute_entry_point(app_instance)
         
         return True
@@ -77,6 +86,10 @@ class ART_Runtime:
         
         # O loop principal da aplicação Android (Main Looper) começaria aqui
         
+        # Simulação de coleta de perfil (PGO)
+        self._collect_pgo_data(app_instance['package'], ["onCreate", "onStart", "onResume", "onDrawFrame"])
+
+        
     def stop_app(self, package_name):
         """Para um aplicativo em execução."""
         if package_name in self.running_apps:
@@ -92,6 +105,34 @@ class ART_Runtime:
             print(f"ART Runtime: {package_name} encerrado.")
             return True
         return False
+
+    def _load_pgo_profiles(self):
+        """Carrega perfis de otimização guiada por perfil (PGO) do disco."""
+        # Em um SO real, leria um arquivo de perfil
+        self.profile_data = {
+            "com.example.myapp": ["onCreate", "onStart", "onResume"] # Exemplo de perfil
+        }
+        print("ART Runtime: Perfis PGO carregados.")
+
+    def _optimize_and_compile(self, package_name):
+        """Otimiza e compila o código DEX usando PGO."""
+        if package_name in self.profile_data:
+            profile = self.profile_data[package_name]
+            print(f"  PGO Ativado: Otimizando {len(profile)} métodos para inicialização rápida.")
+            # Em um SO real, o DEX seria recompilado para código nativo otimizado
+        else:
+            print("  PGO Desativado: Compilação AOT padrão.")
+
+    def _collect_pgo_data(self, package_name, methods):
+        """Coleta dados de perfil de execução para otimizações futuras."""
+        if package_name not in self.profile_data:
+            self.profile_data[package_name] = []
+            
+        for method in methods:
+            if method not in self.profile_data[package_name]:
+                self.profile_data[package_name].append(method)
+                
+        print(f"  PGO Coletado: {len(methods)} métodos registrados para otimização futura.")
 
 # Exemplo de uso (para teste interno)
 if __name__ == "__main__":

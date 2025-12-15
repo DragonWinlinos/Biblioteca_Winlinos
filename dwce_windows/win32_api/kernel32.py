@@ -1,7 +1,7 @@
 import os
 import sys
-import time
-from ...dwce_core.process_manager import ProcessManager # Assumindo a criação futura do ProcessManager
+import timefrom ...dwce_core.process_manager.process_manager import ProcessManager # Assumindo a criação futura do ProcessManager
+from ...dwce_core.syscall_unified.syscall_unified import translate_win_syscall # Para tradução de syscalls
 
 # --- Implementação da API kernel32.dll (Core System) ---
 
@@ -33,6 +33,12 @@ def CreateProcessA(
     process_id = os.getpid() + 1 # PID simulado
     thread_id = os.getpid() + 2 # TID simulado
     
+    # --- Implementação WoW64 Nativo (Simulação) ---
+    # Se o processo for 32-bit em um ambiente 64-bit, a chamada é traduzida
+    if process_handle == 0x10000000 and ProcessManager().get_system_arch() == "64bit":
+        print("  WoW64 Nativo: Traduzindo chamada 32-bit para 64-bit.")
+        # Em um SO real, isso envolveria a tradução dos argumentos da pilha
+        
     # Atualizar a estrutura lpProcessInformation (simulação)
     # lpProcessInformation.hProcess = process_handle
     # lpProcessInformation.hThread = thread_handle

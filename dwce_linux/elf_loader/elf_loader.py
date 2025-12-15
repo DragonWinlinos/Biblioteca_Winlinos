@@ -14,6 +14,8 @@ class ELFLoader:
         self.is_64bit = False
         self.entry_point = 0
         self.program_headers = []
+        self.hash_table = None # Tabela de hash ELF para carregamento rápido
+
 
     def load(self):
         """Carrega e mapeia o binário ELF na memória."""
@@ -28,6 +30,9 @@ class ELFLoader:
             return False
         if not self._parse_program_headers():
             return False
+        
+        # Nova otimização: Pré-computação de Hash
+        self._precompute_hash()
         
         print(f"ELF Loader: Binário {self.file_path} carregado com sucesso.")
         print(f"  Arquitetura: {'64-bit' if self.is_64bit else '32-bit'}")
@@ -128,6 +133,22 @@ class ELFLoader:
         # Simulação:
         # dwce_core.process_manager.start_execution(self.entry_point)
         pass
+
+    def _precompute_hash(self):
+        """
+        Simula a pré-computação da tabela de hash ELF (DT_HASH ou DT_GNU_HASH)
+        para acelerar a resolução de símbolos dinâmicos.
+        """
+        # Em um SO real, isso seria feito pelo compilador/linker ou na primeira execução.
+        # Aqui, simulamos a criação de uma tabela de hash otimizada.
+        
+        # Simulação de 100 símbolos
+        self.hash_table = {f"symbol_{i}": 0xDEADBEEF + i for i in range(100)}
+        print(f"  Otimização ELF: Tabela de Hash pré-computada com {len(self.hash_table)} símbolos.")
+        
+    def resolve_symbol(self, symbol_name):
+        """Resolve um símbolo usando a tabela de hash pré-computada."""
+        return self.hash_table.get(symbol_name, 0)
 
 # Exemplo de uso (para teste interno)
 if __name__ == "__main__":

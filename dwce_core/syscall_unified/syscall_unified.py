@@ -17,6 +17,8 @@ SYSCALL_MAP = {
     "WRITE_FILE": 1,       # Exemplo de número de syscall Linux para write
     "READ_FILE": 0,        # Exemplo de número de syscall Linux para read
     "GET_TIME": 201,       # Exemplo de número de syscall Linux para time
+    "GET_CPU_INFO": 202,   # Simulação de syscall para getcpu
+
 }
 
 def execute_syscall(syscall_name, *args):
@@ -46,8 +48,14 @@ def execute_syscall(syscall_name, *args):
         return len(args[1])
         
     elif syscall_name == "GET_TIME":
-        # Simulação de chamada time nativa
+        # Implementação vDSO/Userspace Bypass: Retorna o tempo sem transição de kernel
+        # Em um SO real, isso leria a memória mapeada do vDSO
         return int(time.time())
+        
+    elif syscall_name == "GET_CPU_INFO":
+        # Implementação vDSO/Userspace Bypass: Retorna informações de CPU/core
+        # Simulação: (core_id, node_id)
+        return (os.getpid() % os.cpu_count(), 0) # Retorna o core baseado no PID para simulação
         
     else:
         print(f"  -> Syscall {syscall_name} não mapeada. Execução direta (se possível).")
