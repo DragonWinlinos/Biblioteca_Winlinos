@@ -1,0 +1,31 @@
+# PKGBUILD for DWCE Graphics (DXVK/VKD3D-Proton)
+
+pkgname=dwce-graphics
+pkgver=2.3
+pkgrel=1
+pkgdesc="Optimized DXVK and VKD3D-Proton for DirectX translation within the DWCE environment."
+arch=('x86_64')
+url="https://github.com/DragonWinlinos/Biblioteca_Winlinos"
+license=('LGPL')
+depends=('vulkan-icd-loader' 'lib32-vulkan-icd-loader')
+makedepends=('git' 'meson' 'ninja' 'gcc' 'mingw-w64')
+
+source=("dxvk-${pkgver}.tar.gz::https://github.com/doitsujin/dxvk/archive/v${pkgver}.tar.gz"
+        "vkd3d-proton-${pkgver}.tar.gz::https://github.com/HansKristian-Work/vkd3d-proton/archive/v${pkgver}.tar.gz")
+sha256sums=('SKIP'
+            'SKIP')
+
+prepare() {
+  # Preparation steps for DXVK and VKD3D-Proton
+  # This is where custom patches for FSR/DLSS integration would be applied
+}
+
+build() {
+  # Build DXVK and VKD3D-Proton for both 32-bit and 64-bit architectures
+}
+
+package() {
+  # Install the resulting DLLs into the appropriate DWCE directories
+  install -d "${pkgdir}/usr/share/dwce/dxvk"
+  install -d "${pkgdir}/usr/share/dwce/vkd3d-proton"
+}

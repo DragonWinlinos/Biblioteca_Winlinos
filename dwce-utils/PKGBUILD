@@ -1,0 +1,30 @@
+# PKGBUILD for DWCE Utilities and Isolation Scripts
+
+pkgname=dwce-utils
+pkgver=1.0
+pkgrel=1
+pkgdesc="Scripts and utilities for managing the isolated DWCE environment and anti-cheat obfuscation."
+arch=('x86_64')
+url="https://github.com/DragonWinlinos/Biblioteca_Winlinos"
+license=('GPL3')
+depends=('bubblewrap' 'python' 'python-psutil')
+makedepends=('git')
+
+source=("dwce-launcher.py"
+        "dwce-isolate.sh")
+sha256sums=('SKIP'
+            'SKIP')
+
+package() {
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/usr/share/dwce"
+
+  # Install the main launcher script (Python)
+  install -m 755 dwce-launcher.py "${pkgdir}/usr/bin/dwce-launcher"
+
+  # Install the isolation script (Shell)
+  install -m 755 dwce-isolate.sh "${pkgdir}/usr/share/dwce/dwce-isolate.sh"
+
+  # Create a placeholder for the DWCE environment
+  install -d "${pkgdir}/etc/dwce"
+}

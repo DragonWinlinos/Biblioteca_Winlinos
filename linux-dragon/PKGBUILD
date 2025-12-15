@@ -1,0 +1,56 @@
+# PKGBUILD for linux-dragon (Optimized Kernel)
+
+pkgname=linux-dragon
+pkgver=6.6.10
+pkgrel=1
+pkgdesc="The Linux kernel with low-latency patches (MuQSS/F-Sync) and Waydroid support (binder/ashmem) for Dragon Winlinos."
+arch=('x86_64')
+url="https://github.com/DragonWinlinos/Biblioteca_Winlinos"
+license=('GPL2')
+depends=('coreutils' 'kmod' 'initramfs')
+makedepends=('git' 'bc' 'perl' 'tar' 'xz' 'elfutils' 'fakeroot' 'gcc')
+source=("https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${pkgver}.tar.xz"
+        "low-latency-patch-${pkgver}.patch::https://example.com/low-latency-patch-${pkgver}.patch") # Placeholder for actual patch
+sha256sums=('SKIP' # Kernel tarball
+            'SKIP') # Patch file
+
+_kernelname=dragon
+_basekernel=6.6
+
+prepare() {
+  cd "linux-${pkgver}"
+  # Apply low-latency patches (MuQSS/F-Sync)
+  patch -Np1 -i "../low-latency-patch-${pkgver}.patch"
+
+  # Copy and modify the Arch kernel config
+  cp /proc/config.gz .
+  gunzip config.gz
+  mv config .config
+
+  # Ensure Waydroid support is enabled
+  # CONFIG_ANDROID_BINDER_IPC=y
+  # CONFIG_ASHMEM=y
+  # These will be set in the final .config
+}
+
+build() {
+  cd "linux-${pkgver}"
+  # Build the kernel
+  make clean
+  make -j$(nproc)
+}
+
+package() {
+  cd "linux-${pkgver}"
+  # Install modules
+  make modules_install INSTALL_MOD_PATH="${pkgdir}"
+
+  # Install kernel
+  make install INSTALL_PATH="${pkgdir}/boot"
+
+  # Install headers
+  make headers_install INSTALL_HDR_PATH="${pkgdir}/usr"
+
+  # Create initial ramdisk (mkinitcpio is typically run post-install)
+  # For simplicity in PKGBUILD, we skip mkinitcpio here, it will be handled by the installer.
+}

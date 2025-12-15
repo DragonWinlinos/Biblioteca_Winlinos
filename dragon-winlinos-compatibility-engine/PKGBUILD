@@ -1,0 +1,48 @@
+# PKGBUILD for Dragon Winlinos Compatibility Engine (DWCE)
+
+pkgname=dragon-winlinos-compatibility-engine
+pkgver=8.0.2
+pkgrel=1
+pkgdesc="Customized Wine/Proton fork with advanced anti-cheat obfuscation and performance patches (DXVK/VKD3D-Proton/FEX) for Dragon Winlinos."
+arch=('x86_64')
+url="https://github.com/DragonWinlinos/Biblioteca_Winlinos"
+license=('LGPL') # Retaining LGPL from Wine/Proton base
+depends=('lib32-vulkan-icd-loader' 'vulkan-icd-loader' 'mesa' 'lib32-mesa' 'libx11' 'lib32-libx11')
+makedepends=('git' 'gcc' 'mingw-w64' 'python' 'flex' 'bison')
+source=("https://github.com/WineHQ/wine/archive/refs/tags/wine-${pkgver}.tar.gz"
+        "dwce-obfuscation-patch.patch" # Custom patch for anti-cheat evasion
+        "dwce-performance-patch.patch") # Custom patch for FEX/DLSS/FSR integration
+sha256sums=('SKIP' # Wine tarball
+            'SKIP' # Obfuscation patch
+            'SKIP') # Performance patch
+
+prepare() {
+  cd "wine-${pkgver}"
+  # Apply custom obfuscation and performance patches
+  patch -Np1 -i "../dwce-obfuscation-patch.patch"
+  patch -Np1 -i "../dwce-performance-patch.patch"
+
+  # Configure Wine with necessary flags for DWCE
+  ./configure --prefix=/usr \
+              --enable-win64 \
+              --enable-debug-runtime \
+              --with-vulkan \
+              --with-vulkan-driver=vulkan-icd-loader \
+              --with-x \
+              --with-mingw
+}
+
+build() {
+  cd "wine-${pkgver}"
+  # Build the DWCE
+  make -j$(nproc)
+}
+
+package() {
+  cd "wine-${pkgver}"
+  # Install the DWCE
+  make install DESTDIR="${pkgdir}"
+
+  # Post-install: Integrate DXVK/VKD3D-Proton and set up the isolated environment scripts
+  # These scripts will be part of the dwce-utils package, but the core binary is here.
+}

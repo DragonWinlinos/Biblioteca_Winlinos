@@ -1,0 +1,3 @@
+# Custom patch for anti-cheat evasion and system call masking.
+# This patch will modify Wine's source code to hide Linux-specific identifiers and present a Windows-like environment to the anti-cheat software.
+# (Content to be developed in the implementation phase)

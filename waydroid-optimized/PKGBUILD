@@ -1,0 +1,37 @@
+# PKGBUILD for Waydroid Optimized
+
+pkgname=waydroid-optimized
+pkgver=1.4.2
+pkgrel=1
+pkgdesc="Optimized Waydroid for Dragon Winlinos with full GPU acceleration and seamless desktop integration."
+arch=('x86_64')
+url="https://github.com/DragonWinlinos/Biblioteca_Winlinos"
+license=('GPL3')
+depends=('lxc' 'python-pyclip' 'python-gbinder' 'libgbinder' 'mesa')
+makedepends=('git' 'cmake' 'ninja' 'python-setuptools')
+
+source=("https://github.com/waydroid/waydroid/archive/refs/tags/${pkgver}.tar.gz"
+        "waydroid-gpu-patch.patch") # Custom patch to ensure full GPU acceleration
+sha256sums=('SKIP'
+            'SKIP')
+
+prepare() {
+  cd "waydroid-${pkgver}"
+  # Apply custom GPU acceleration patch
+  patch -Np1 -i "../waydroid-gpu-patch.patch"
+}
+
+build() {
+  cd "waydroid-${pkgver}"
+  # Build Waydroid
+  cmake -B build -S .
+  cmake --build build
+}
+
+package() {
+  cd "waydroid-${pkgver}"
+  # Install Waydroid
+  cmake --install build --prefix=/usr
+
+  # Post-install: Set up LXC container configuration for better isolation and performance
+}
