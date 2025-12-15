@@ -149,6 +149,7 @@ class DragonInstaller(Gtk.Window):
         vbox.pack_start(self.status_label, False, False, 0)
 
         self.stack.add_named(vbox, "wifi")
+        self.check_hardware_compatibility()
 
     def create_install_page(self):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -211,6 +212,22 @@ class DragonInstaller(Gtk.Window):
         except Exception as e:
             self.status_label.set_text(f"Erro de conexão: {e}")
 
+    def check_hardware_compatibility(self):
+        # Rotina de verificação de hardware (simulação)
+        arch = os.uname().machine
+        ram_mb = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / (1024.**2)
+        
+        self.hardware_info = {
+            "arch": arch,
+            "ram": f"{ram_mb:.0f} MB",
+            "is_64bit": arch in ('x86_64', 'amd64'),
+            "is_low_ram": ram_mb < 2048 # Exemplo: menos de 2GB de RAM
+        }
+        
+        print(f"Hardware Detectado: {self.hardware_info}")
+        
+        # O DI usará essas informações para selecionar o perfil de instalação (64-bit completo, 32-bit minimalista)
+        
     def on_connect_success(self):
         self.status_label.set_text("Conexão bem-sucedida! Clique em Próximo para continuar.")
         # Avançar para a próxima fase (Particionamento)
